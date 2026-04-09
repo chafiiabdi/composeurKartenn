@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composeur cartographique Etat</title>
+  <meta name="description" content="Interface de mise en page cartographique basee sur le DSFR.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.14.4/dist/dsfr/dsfr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.14.4/dist/utility/utility.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="fr-container--fluid carto-app">
+    <header class="fr-header carto-header" role="banner">
+      <div class="fr-header__body">
+        <div class="fr-container">
+          <div class="fr-header__body-row">
+            <div class="fr-header__brand fr-enlarge-link">
+              <div class="fr-header__brand-top">
+                <div class="fr-header__logo">
+                  <p class="fr-logo">
+                    Préfet
+                    <br>DE LA ZONE
+                    <br>DE DEFENSE
+                    <br>ET DE SECURITE 
+                    <br>OUEST
+                  </p>
+                </div>
+              </div>
+              <div class="fr-header__service">
+                <a href="#" title="Accueil - Composeur cartographique">
+                  <p class="fr-header__service-title">Composeur cartographique</p>
+                </a>
+                <p class="fr-header__service-tagline">Mise en page de carte, habillage et gestion des calques</p>
+              </div>
+            </div>
+            <div class="carto-header__actions">
+              <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-theme-fill" type="button" id="openDisplaySettings">
+                Parametres d'affichage
+              </button>
+              <button class="fr-btn fr-btn--secondary" type="button" id="resetWorkspace">Reinitialiser</button>
+              <button class="fr-btn" type="button" id="exportImage">Exporter PNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="fr-container--fluid carto-main" id="main-content">
+      <aside class="carto-panel carto-panel--left" id="leftPanel">
+        <button class="carto-panel-toggle" type="button" id="leftPanelToggle" aria-controls="leftPanel" aria-expanded="true" aria-label="Replier la boite a outils">
+          <span class="carto-panel-toggle__icon" aria-hidden="true">‹</span>
+        </button>
+        <section class="fr-card fr-card--no-arrow carto-card">
+          <div class="fr-card__body">
+            <div class="fr-card__content">
+              <h2 class="fr-h6">Carte source</h2>
+              <label class="fr-label" for="mapUpload">
+                Importer une carte image
+                <span class="fr-hint-text">Formats acceptes : PNG, JPG, WEBP, SVG</span>
+              </label>
+              <input class="fr-upload" type="file" id="mapUpload" accept="image/*" aria-describedby="uploadStatus">
+              <p class="fr-text--xs carto-muted" id="uploadStatus">Aucune image importee pour l'instant.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="fr-card fr-card--no-arrow carto-card">
+          <div class="fr-card__body">
+            <div class="fr-card__content carto-toolbox">
+              <div class="carto-toolbox__head">
+                <h2 class="fr-h6">Boite a outils</h2>
+                <p class="fr-text--xs carto-muted">Choisissez la rubrique dont vous avez besoin</p>
+              </div>
+              <div class="fr-search-bar carto-toolbox-search" role="search">
+                <label class="fr-label" for="toolboxSearch">Rechercher une rubrique</label>
+                <input class="fr-input" id="toolboxSearch" type="search" placeholder="Rechercher une rubrique...">
+              </div>
+
+              <div class="carto-toolbox__group">
+                <p class="carto-toolbox__group-title">Rubriques standards</p>
+                <div class="carto-toolbox__menu carto-toolbox__menu--side">
+                  <button class="carto-toolbox__menu-btn is-active" type="button" data-toolbox-target="habillagePanel">Habillage</button>
+                  <button class="carto-toolbox__menu-btn" type="button" data-toolbox-target="pictogrammesPanel">Pictogrammes</button>
+                </div>
+              </div>
+
+              <section class="carto-toolbox__panel is-active" id="habillagePanel">
+                <div class="carto-form-grid">
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="titleInput">Titre</label>
+                    <input class="fr-input" id="titleInput" type="text" value="Titre de la carte">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="subtitleInput">Sous-titre</label>
+                    <input class="fr-input" id="subtitleInput" type="text" value="Sous-titre ou precision territoriale">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="sourceInput">Source</label>
+                    <input class="fr-input" id="sourceInput" type="text" value="Source : a completer">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="northLabelInput">Orientation</label>
+                    <input class="fr-input" id="northLabelInput" type="text" value="N">
+                  </div>
+                </div>
+                <div class="carto-inline-actions">
+                  
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" data-add="text">Ajouter un texte</button>
+                </div>
+              </section>
+
+              <section class="carto-toolbox__panel" id="pictogrammesPanel">
+                <div class="carto-section-head">
+                  <div>
+                    <p class="fr-text--xs carto-muted">Elements prets a placer sur la carte</p>
+                  </div>
+                </div>
+                <div class="fr-input-group">
+                  <label class="fr-label" for="customPictoUpload">
+                    Ajouter mes pictogrammes
+                    <span class="fr-hint-text">Import multiple : PNG, JPG, WEBP, SVG</span>
+                  </label>
+                  <input class="fr-upload" type="file" id="customPictoUpload" accept="image/*,.svg" multiple>
+                </div>
+                <div class="carto-picto-grid" id="pictoLibrary">
+                  <button class="carto-picto" type="button" data-picto="administration">
+                    <span class="carto-picto__icon">RF</span>
+                    <span class="carto-picto__label">Service public</span>
+                  </button>
+                  <button class="carto-picto" type="button" data-picto="transport">
+                    <span class="carto-picto__icon">M</span>
+                    <span class="carto-picto__label">Mobilite</span>
+                  </button>
+                  <button class="carto-picto" type="button" data-picto="education">
+                    <span class="carto-picto__icon">E</span>
+                    <span class="carto-picto__label">Education</span>
+                  </button>
+                  <button class="carto-picto" type="button" data-picto="sante">
+                    <span class="carto-picto__icon">S</span>
+                    <span class="carto-picto__label">Sante</span>
+                  </button>
+                  <button class="carto-picto" type="button" data-picto="culture">
+                    <span class="carto-picto__icon">C</span>
+                    <span class="carto-picto__label">Culture</span>
+                  </button>
+                  <button class="carto-picto" type="button" data-picto="eau">
+                    <span class="carto-picto__icon">EAU</span>
+                    <span class="carto-picto__label">Hydro</span>
+                  </button>
+                </div>
+                <div class="carto-favorites">
+                  <div class="carto-section-head">
+                    <div>
+                      <h3 class="fr-h6">Pictos les plus utilises</h3>
+                      <p class="fr-text--xs carto-muted">Zone rapide pour vos favoris metier</p>
+                    </div>
+                  </div>
+                  <div class="carto-picto-grid" id="favoritePictos"></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="carto-workspace">
+        <div class="fr-card fr-card--no-arrow carto-card carto-toolbar">
+          <div class="fr-card__body">
+            <div class="fr-card__content">
+              <div class="carto-toolbar__row">
+                <div class="carto-toolbar__actions">
+                  <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm" type="button" id="zoomOut">Zoom -</button>
+                  <span class="carto-zoom" id="zoomValue">100 %</span>
+                  <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm" type="button" id="zoomIn">Zoom +</button>
+                  <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm" type="button" id="toggleGrid">Grille</button>
+                </div>
+                <div class="carto-toolbar__legend">
+                  <span class="carto-dot carto-dot--active"></span>
+                  <span class="fr-text--xs">Cliquer un element pour le selectionner, puis le deplacer.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carto-stage-wrap">
+          <div class="carto-stage-layout">
+            <div class="carto-stage" id="stage">
+              <div class="carto-board" id="board">
+                <div class="carto-board__grid" id="boardGrid"></div>
+                <div class="map-layer" id="mapLayer" data-layer-id="map-base" data-type="map" style="left: 0%; top: 0%; width: 74%; height: 100%;">
+                  <div class="map-layer__empty" id="emptyMapState">
+                    <p class="fr-text--sm">Importez une image pour commencer votre composition cartographique.</p>
+                  </div>
+                  <img id="mapImage" alt="Carte importee">
+                </div>
+                <div class="board-element board-element--title is-selected" data-layer-id="title-base" data-type="title" style="left: 0%; top: 0%; width: 34%; height: 6.5%;">
+                  <h2 id="boardTitle">Titre de la carte</h2>
+                </div>
+                <div class="board-element board-element--source" data-layer-id="source-base" data-type="source" style="left: 0.25%; top: 18%; width: 2.2%; height: 22%;">
+                  <p class="board-element__eyebrow">Source</p>
+                  <p id="boardSource">Source : a completer</p>
+                </div>
+                
+                <div
+                  class="carto-legend-resizer"
+                  id="legendResizer"
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="Redimensionner la legende"
+                  title="Glisser pour redimensionner la legende"
+                ></div>
+
+                <aside class="carto-legend-panel">
+                  <div class="carto-legend-card">
+                    <div class="carto-legend-sections" id="legendSections"></div>
+                    <p class="carto-muted carto-legend-hint" id="legendHint">La legende se met a jour selon les elements visibles sur la carte.</p>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="carto-panel carto-panel--right">
+        <section class="fr-card fr-card--no-arrow carto-card">
+          <div class="fr-card__body">
+            <div class="fr-card__content carto-toolbox carto-toolbox--side">
+              <div class="carto-toolbox__group">
+                <p class="carto-toolbox__group-title">Rubriques standards</p>
+                <div class="carto-toolbox__menu carto-toolbox__menu--side">
+                  <button class="carto-toolbox__menu-btn" type="button" data-side-target="layersPanel">Calques</button>
+                  <button class="carto-toolbox__menu-btn is-active" type="button" data-side-target="propertiesPanel">Proprietes</button>
+                </div>
+              </div>
+
+              <section class="carto-side-panel" id="layersPanel">
+                <div class="carto-section-head">
+                  <div>
+                    <h2 class="fr-h6">Calques</h2>
+                    <p class="fr-text--xs carto-muted">Tous les ajouts sont administres ici</p>
+                  </div>
+                  <span class="fr-badge fr-badge--green-tilleul-verveine" id="layerCount">4 calques</span>
+                </div>
+                <div class="carto-layers" id="layersList"></div>
+              </section>
+
+              <section class="carto-side-panel is-active" id="propertiesPanel">
+                <h2 class="fr-h6">Proprietes de l'element</h2>
+                <p class="fr-text--xs carto-muted" id="selectionHint">Selectionnez un element sur la planche pour ajuster son texte ou sa taille.</p>
+                <div class="carto-form-grid">
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedText">Texte / etiquette</label>
+                    <input class="fr-input" id="selectedText" type="text" placeholder="Texte de l'element selectionne">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedFontSize">Taille du texte</label>
+                    <input class="fr-input" id="selectedFontSize" type="number" min="4" max="72" step="1" value="28">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedTextColor">Couleur du texte</label>
+                    <input class="fr-input carto-color-input" id="selectedTextColor" type="color" value="#ffffff">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedTextBackground">Fond du texte</label>
+                    <input class="fr-input carto-color-input" id="selectedTextBackground" type="color" value="#000091">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedFontFamily">Police</label>
+                    <select class="fr-select" id="selectedFontFamily">
+                      <option value="Marianne, Arial, sans-serif">Marianne</option>
+                      <option value="Georgia, Times New Roman, serif">Serif</option>
+                      <option value="Courier New, monospace">Monospace</option>
+                    </select>
+                  </div>
+                  <div class="carto-inline-actions carto-inline-actions--tight">
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="toggleBold">Gras</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="toggleItalic">Italique</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="toggleTransparentBackground">Fond transparent</button>
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedWidth">Largeur</label>
+                    <input class="fr-input" id="selectedWidth" type="range" min="1" max="95" value="30">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedHeight">Hauteur</label>
+                    <input class="fr-input" id="selectedHeight" type="range" min="1" max="95" value="16">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="selectedRotation">Rotation</label>
+                    <input class="fr-input" id="selectedRotation" type="range" min="-180" max="180" value="0">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendColumns">Elements par ligne (legende)</label>
+                    <input class="fr-input" id="legendColumns" type="range" min="1" max="6" value="1">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSymbolSize">Taille des pictos (legende)</label>
+                    <input class="fr-input" id="legendSymbolSize" type="range" min="10" max="44" value="20">
+                  </div>
+                  <div class="carto-section-head">
+                    <div>
+                      <h3 class="fr-h6">Gestion de la legende</h3>
+                      <p class="fr-text--xs carto-muted">Ajouter un sous-bloc ou reinitialiser la structure.</p>
+                    </div>
+                  </div>
+                  <div class="carto-inline-actions">
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendAddSection">+ Sous-bloc</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendReset">Reinitialiser</button>
+                  </div>
+                </div>
+                <div class="carto-inline-actions carto-inline-actions--tight">
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="bringForward">Monter</button>
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="sendBackward">Descendre</button>
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="deleteLayer">Supprimer</button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="carto-display-settings" id="displaySettings" hidden>
+    <div class="carto-display-settings__backdrop" id="displaySettingsBackdrop"></div>
+    <section class="carto-display-settings__panel" role="dialog" aria-modal="true" aria-labelledby="displaySettingsTitle">
+      <div class="carto-display-settings__head">
+        <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-close-line" type="button" id="closeDisplaySettings">
+          Fermer
+        </button>
+      </div>
+      <div class="carto-display-settings__body">
+        <h2 class="fr-h3" id="displaySettingsTitle">Parametres d'affichage</h2>
+        <p class="fr-text--lg">Choisissez un theme pour personnaliser l'apparence du site.</p>
+
+        <div class="carto-theme-options">
+          <label class="carto-theme-card" for="themeLight">
+            <span class="carto-theme-card__radio">
+              <input type="radio" name="displayTheme" id="themeLight" value="light">
+            </span>
+            <span class="carto-theme-card__content">
+              <span class="carto-theme-card__title">Theme clair</span>
+            </span>
+            <span class="carto-theme-card__icon" aria-hidden="true">☀</span>
+          </label>
+
+          <label class="carto-theme-card" for="themeDark">
+            <span class="carto-theme-card__radio">
+              <input type="radio" name="displayTheme" id="themeDark" value="dark">
+            </span>
+            <span class="carto-theme-card__content">
+              <span class="carto-theme-card__title">Theme sombre</span>
+            </span>
+            <span class="carto-theme-card__icon" aria-hidden="true">☾</span>
+          </label>
+
+          <label class="carto-theme-card" for="themeSystem">
+            <span class="carto-theme-card__radio">
+              <input type="radio" name="displayTheme" id="themeSystem" value="system">
+            </span>
+            <span class="carto-theme-card__content">
+              <span class="carto-theme-card__title">Systeme</span>
+              <span class="carto-theme-card__hint">Utilise les parametres systeme.</span>
+            </span>
+            <span class="carto-theme-card__icon" aria-hidden="true">⚙</span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.14.4/dist/dsfr/dsfr.module.min.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.14.4/dist/dsfr/dsfr.nomodule.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
