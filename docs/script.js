@@ -2122,6 +2122,92 @@ function renderPictoLibrary() {
   });
 }
 
+function toAbsoluteUrl(path) {
+  try {
+    return new URL(path, window.location.href).href;
+  } catch (error) {
+    return path;
+  }
+}
+
+async function loadPictosFromManifest() {
+  try {
+    const response = await fetch("./pictos/manifest.json", { cache: "no-store" });
+    if (!response.ok) {
+      return 0;
+    }
+
+    const items = await response.json();
+    if (!Array.isArray(items)) {
+      return 0;
+    }
+
+    let added = 0;
+    items.forEach((entry, index) => {
+      if (!entry) {
+        return;
+      }
+      const src = typeof entry === "string" ? entry : entry.src;
+      const label = typeof entry === "string"
+        ? entry.split("/").pop().replace(/\.[^.]+$/, "")
+        : (entry.label || entry.src || "").split("/").pop().replace(/\.[^.]+$/, "");
+      if (!src) {
+        return;
+      }
+      const key = `local-manifest-${index}-${label}`.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+      pictoCatalog[key] = {
+        label: label || `Picto ${index + 1}`,
+        src: toAbsoluteUrl(src),
+      };
+      added += 1;
+    });
+    return added;
+  } catch (error) {
+    return 0;
+  }
+}
+
+async function loadPictosFromDirectoryListing() {
+  try {
+    const response = await fetch("./pictos/", { cache: "no-store" });
+    if (!response.ok) {
+      return 0;
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const links = [...doc.querySelectorAll("a[href]")].map((node) => node.getAttribute("href") || "");
+    const imageLinks = links.filter((href) => /\.(svg|png|jpe?g|webp)$/i.test(href));
+    if (!imageLinks.length) {
+      return 0;
+    }
+
+    let added = 0;
+    imageLinks.forEach((href, index) => {
+      const normalized = href.startsWith("http") ? href : `./pictos/${href.replace(/^\.?\//, "")}`;
+      const label = normalized.split("/").pop().replace(/\.[^.]+$/, "");
+      const key = `local-dir-${index}-${label}`.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+      pictoCatalog[key] = {
+        label: label || `Picto ${index + 1}`,
+        src: toAbsoluteUrl(normalized),
+      };
+      added += 1;
+    });
+    return added;
+  } catch (error) {
+    return 0;
+  }
+}
+
+async function loadLocalPictos() {
+  const fromManifest = await loadPictosFromManifest();
+  if (fromManifest > 0) {
+    return;
+  }
+  await loadPictosFromDirectoryListing();
+}
+
 function attachElementEvents(element) {
   createResizeHandle(element);
 
@@ -3799,10 +3885,15 @@ board.addEventListener("click", (event) => {
   }
 });
 
-renderPictoLibrary();
-renderFavoritePictos();
-applyLayerOrder();
-renderLayers();
-syncBaseTexts();
-updateZoom();
+async function initializeApp() {
+  await loadLocalPictos();
+  renderPictoLibrary();
+  renderFavoritePictos();
+  applyLayerOrder();
+  renderLayers();
+  syncBaseTexts();
+  updateZoom();
+}
+
+initializeApp();
 scheduleMapLayerFrameSync();
