@@ -1,0 +1,183 @@
+SCRIPT DES MESSAGES UTILISATEUR (ordre chronologique)
+
+1. le dossier est vide,pourtant je veux que tu me devoloppe une interface de mise en page cartographique ben utilisant le susteme de designe de l'Etat. cette aura la capacité : d'importer une carte en format image; d'ajouter un titre, source, orientation, source; un certaines nombres de pictogrammes de désigne de l'etat prete pour placer sur la carte; et toutes ajout est controler par le systeme de calque (cadnat)
+2. Je vous donne le lien des picto à mettre à disposition dans l'interface et je veux voir un dans l'interface une zone ou je peux mettre les pictos les plus utilisées, en plus j'arrive pas à bouger la carte dans/
+3. voici le lien des picto: https://github.com/GouvernementFR/dsfr/releases/download/v1.14.4/dsfr-v1.14.4.zip
+4. certaines points à régler : 1. je veux ajouter moi meme mes pictogrammes; je veux que tous les cadres (tire,source, picto) soient dynamique (je veux agrandir ou retrecire sa taille); les calques, il faut ajouter un cadnat que losque le cadnat est fermé, le deplacement des élements dans l'interface est bloquée aussi
+5. pour le cadnas de calque c'est bon, les autres non. 1. je peux rédimensionner les titres et sources mais les texte de cadrage de titre ou source ne s'applique pas avec le cadre de titre ou source. 2.je peux ajouter de pictos mais quand j'ajoute les pictogrammes dans l'interface, les pictos ont une cadrage et se presente imcomplet
+6. je veux qu'on j'ajoute les picrtos sur l'interface ne porte ni un titre, ni un cadrage, je veux un picto simple
+7. tres bien, mais dimunier plus la plus petite dimention du picto
+8. j'arrive pas à exporter l'image
+9. Export en cours puis il donne rien
+10. un onglet blanc s’ouvre et auncun export
+11. rien ne marche, je veux quand je clic sur export, une image de la carte mise en page se télécharge
+12. le message réçu sans rien télécharger : L'export PNG a echoue. Rechargez la page puis reessayez.
+13. voici l'image télécharger, les pictos ne s'affichent pas
+14. tres bien maintenant on va faire que modification de design: supprimer le bloc (Atelier de mise en page)
+15. les cotes de blocs sont arrandie, donc je veux qu'ils soit des angles et ques les blocs sont collent et couvrent l'ecran
+16. vas-y
+17. je veux que l'interface ne depasse pas le 100% de l'ecran
+18. tres bien, mais je veux pas scroler dans chaque blocs pour voir la partie cachée
+19. ha l'interface n'est pas responsive sur l'ecran
+20. Une partie de chaque blocs est cachée sous le blocs suivant, et j'arrive pas voir cette partie cachée
+21. tres bien, là maintenant, on modifier bloc par bloc/ on commence par le bloc (Zoom - 100 % Zoom + Grille Cliquer un element pour le selectionner, puis le deplacer.) en diminuant sa taille
+22. dimunuer la taille de cette div : fr-card fr-card--no-arrow carto-card carto-toolbar
+23. l'interface est moche, changer le l'architecture, l'écriture doit etre plus petite, l'interface n'est depasse pas le 100% de l'ecran et que tou le contenu de chaque blocs doit etre consultable
+24. revenez à l'ancienne version celle que tu m'as proposé est tres chaotique
+25. on corrige bloc par bloc: commençons par le bloc centrale, dite moi c'est quelle partie ?
+26. la barre Zoom / Grille sera plus fin
+27. s'est pas fait, elle occupe toujours presque le 100% de l'ecran
+28. Il faut pas que le zoom + depasse le bloc et traverse les autres blocs
+29. s'est pas encore faite, je veux que le zoom + n'est dépasse 3 sur zoom+
+30. réviens à la version précedente
+31. on commence le blocs à gauche, dite moi les élement de ce bloc
+32. on reviens dans la blocs centrale et on divise en deux la zone grise autour de la planche; une pour mettre la planche et l'autrer pour la légande
+33. très bien mais il faut que la lègende est syncroniser avec les élements de la carte
+34. dans la légende il faut que la picto s'apparaient
+35. très bien, mais si un éléments (pictos ou autres) se presenter plus une fois sur la carte; il sufit de mettre une seul fois dans la lègende
+36. je veux copier le picto et coller
+37. ajouter un ctrl+z aussi
+38. pour enregistre, il faut aussi exporter la lègende avec la carte
+39. je veux que ma carte et légende ressemble à cette carte (image fournie)
+40. Très bien, maintenant, je veux avoir un éditeur de texte pour le titre et source (Taille, couleur, police (Miarianne) Gras italique ou autre, fond de texte).
+41. Très bien, mais le probleme l'éditeur de code n'est pas lier au texte (titre, source)
+42. Changement de titre fonctionne les autres non
+43. Il CHANGEMENT DE PROPRIETE NE DONNE RIEN
+44. Je peux pas changer la couleur de texte, couleur de fond du texte, police, taille. et quand je clic sur un texte (titre ou source) le propriete ne reconnait pas le couleur de texte, couleur de fond du texte, police
+45. Non rien ne fonctionne...
+46. Non pas encore, le largeur et l'hauteur de cadre de text e(titre et source) fonctionne bien mais les autres non. je suis déçu
+47. Yes il fonctionne maintenant, je veux que tu enleve "TITRE et sous-titre ou précision) dans la cadre de titre. je veux juste garder Titre de la carte
+48. Pour tout le rédimentionnements : ... et supprimer le petit boutton bleu à cliquer pour rédimentionner
+49. très bien le dimensionnement est bloqué à un certain taille pour retrecir. je veux qu'il soit libre
+50. je veux pivoter la source, et ajouter un Texte independant
+51. Pour le texte libre, faite comme la spurce et titre...
+52. Très bien, mais je veux que toutes les textes (Titre, source et texte libre) soient pivotable
+53. diminuer la plus petite taille de toutes les texte (Titre, source et texte libre)
+54. Ajouter un ctrl + A pour les élement de la planche beige claire
+55. je veux déselectionner certaines élements en gardant les autres et faire bouger tous les éléments qui sont sélectionner
+56. apres le ctrl + a, pour déselectionner ceratines éléments par le shift + clic ne fonctionne pas
+57. Non elle fonctionne pas... je veux qu'il fonctionne comme word ou powerpoint
+58. Très bien, maitenant je veux que je pourrais changer le proprietes de l'element des élément sélectionné
+59. je veux que qu'on je clix sur supprimer de mon clavier se supprimer les éléments sélectionné
+60. très bien pour le texte libre , mais je veux supprimer tous les élements de bloc l'interface de la carte et de bloc claque
+61. supprimer tous les éléments posés sur la carte, tout en gardant l’interface, vider aussi le bloc Calques
+62. dans le bloc à gauche, je veux creer un boite à outils pliable...
+63. je veux un truc comme ça (image)
+64. je veux un trux qui donne ça quand il se déplie (image)
+65. je veux que cette blocs reste à 100% de l'ecran...
+66. revenez à l'anncienne
+67. dimuner la taille des picto et classer en une ligne horizontale
+68. je veux ranger 6 pictos par ligne horizontale
+69. mais diminuer tout ça aussi...
+70. corriger les autres pictos comme celui d'Alerte
+71. Non, revez à la version précedente
+72. T'as mal compris... les libellé et le fond grise derrier les icone s'adapte avec le cadre grise de pictos
+73. ajoute dans l'interface le paramètres d'affichage en respectant le dsfr de l'Etat
+74. Utiliser la version 1.6.5-beta de DSFR
+75. Non non revenez à la version précedente
+76. supprimer ces deux là : Rubriques predefinies / Titre et textes / Bibliotheque pictos
+77. quand le theme est sombre...
+78. Quand la boite à outils est déplié, la bloc carte la place...
+79. le deux bloc se chauvauche quand la boit à outils est déplié
+80. dans la carte: je veux que m'image importe (carte) occupe tout la partie grise...
+81. Non c'est pas fait bien. la carte (image) est trop zomé...
+82. je veux que ma (image) carte exporteé s'affiche comme l'image en pg...
+83. Non, sa donne ça
+84. Oui c'est collé, maitenant je veux ... 21 * 13.5cm (790 * 506 px)
+85. Il faut que la légande s'est trouve dans la carte (image) exporté
+86. je veux mettre la légande dans la partie beige claire dans l'interface
+87. il faut pas que l'image chauvauche avec la légende
+88. c'est bon, mais j'arrive pas à importé une image (carte)
+89. Quand je clic sur choisir un fichier : le navigateur beug...
+90. revenez à la derniere version...
+91. Je veux que la carte meme taille d'hauteur avec la légende...
+92. maintenant, je veux que : Dans la légende je pourrais ajoute de petites blocs...
+93. revenez à la version précedente
+94. t'as mal compris ma dernier demande de la légende...
+95. je veux rendre ma légende dynamique... (image)
+96. Sans mes instruction, je vous demande de rendre le site à la perfection...
+97. Je vois pas la partie propriete de l'element...
+98. j'ai changé d'avis. et je veux presenter le blocs propriete de l'element comment Habillage et Pictogramme
+99. dans la propriete d'element : il ya rien
+100. Dans la liste claque, je voulais séparer en sous-bloc...
+101. Il faut que les blocs ont la possiblité de se déplier ou plier
+102. il faut que la taille des écritures ... responsive
+103. Il faut que la couleur change en grise pour le blocs qui ne sont pas dépliées
+104. Il faut mettre de cote à cote (Habillage et Pictogrammes) comme Calque et Propriete
+105. mettez un petit cadnat verrouillé ou déveroullé...
+106. le cadnat doit etre de design de l'Etat dsfr
+107. le cadnat depasse un peu le cadre
+108. c'est pas fait
+109. Il faut que l'espace de la carte soit : 790 × 506 px
+110. l'espace de la carte est coupé quand je dépasse le 100% de zoom
+111. l'espace doit etre centré. au centre du bloc
+112. dans la légende : il faut que je puis mettre plusieurs pictos en un seule ligne...
+113. la taille de texte doit etre des nombres pas ça
+114. Dans la lélenge : Permettez moi de diminuer la taille de titre (Lélende) redimentionner le cadre de la légende
+115. revenez à la version precedente
+116. la position s'inverse apres que j'exporte le PNG
+117. le probleme presiste toujours... pictos apparaissent élargie...
+118. On arrete là-bas pour le moment et on continue plus tard
+119. Je veux mettre le petit bloc (sous-bloc et réinitialiser) de la légende dans la bloc propriete de l'element
+120. Effacer le titre "Légende" dans la légende
+121. Effacer le bordure de la légende
+122. la carte exporté doit etre présenté comme celui de l'interface cartographique...
+123. l'interface doit etre présenté en deux blocs; légende et image impporté...
+124. Dans la calque : il faut mettre une petite oeil ...
+125. Je veux que ma bloc carte est couverte par cette carte apres l'inportation...
+126. Très bien, mais il ya un petit probleme de zoom...
+127. Non ça va pas ... haute et bas sont pas bonnes
+128. La partie beige claire grillé soient cachées...
+129. Nooon ... je veux que la carte courvrée tout le bloc carte...
+130. Je suis tout à faite d'accord ... extremités gauche et droite coupées
+131. le rédimentionnement de la carte est mauvaise parce que les cotes sont dependant.
+132. Je veux que la carté importé couvre tout l'interface planche
+133. Tres bien , Maintenant je veux que la bloc carte et légende est rédimentionnable...
+134. Très bien. maintenant, il faut que la carte mise en page dans le composeur et l'image exporte se ressemble à 100%
+135. Très bien. maintenant, il faut que la légende ... se ressemble à 100%
+136. Dans l'image exporté : les tailles de l'écriture n'est pas respectés...
+137. Les titres de sous-blocs ... se place au centre...
+138. Titres des sous-blocs centrés ... collé à droite...
+139. Non, à gauche
+140. Dans l'image exportée, il faut pas montre le U D R de la légende
+141. L'orientation(Symbole et titre), texte (...) doit etre rétire de la légende
+142. Le titre de la carte doit etre collé par defaut en haut à gauche ...
+143. Dand l'image exporté: le titre doit etre au centre à gauche du cadre
+144. Dand l'image exporté: une petite ligne doit etre séparer le bloc carte et légende...
+145. il ya rien
+146. Regler la position de source aussi
+147. Toujours pas correcte.
+148. Un texte libre se possition par defaut à gauche de la carte...
+149. Non, revenez à la version precedente
+150. le probleme de source n'est pas reglé
+151. Augmenter la qualité de résolution de la carte exporté
+152. je dois afficher la carte apres l'export dans un espace de : 790 × 506 px
+153. Noon l'affichage est tres floue...
+154. Je veux que l'imag exporté doit etre deux fois : 790 × 506 px
+155. Il faut que le site doit etre responsive et s'adapte avec les écrans
+156. c'est pas responsive
+157. je veux que le zoom par defaut soit 100% de la meme taille que qu'on elle est à 180% maintenant
+158. Je parle de tout le code de ce site
+159. QUELLE VERSION DE dsfr as-tu utilisé pour ce projet ?
+160. le bloc (Gestion des objets, propriétes et Gestion de légande) doit etre sur une meme ligne...
+161. Dans la rubrique Proriete rétirer (... légende ...)
+162. revez à la version précedente
+163. Je veux separer propriete d'élements de la carte ... et Gestion de légende ...
+164. Gestion de legende doit avoir aussi : un Propriete de l'element...
+165. Ua lieu de place U D R sur la lègende deplace dans la Rubrique Gestion de legende
+166. Retirer la source et l'orientation sur la carte et dans le rubrique Habillage
+167. Ajouter un rubrique Forme ... ou je peux trouver tous les formes de powerpoint
+168. je veux cette forme (image)
+169. c'est ça ce que je veux (image Bulles et légendes)
+170. Non c'est pas ajouté. Ajoutez le type de forme de légende que j'ai vous est données
+171. C'est pas dynamique. je veux que le rédimentionnement de fome doit etre comme Powerpoint avec un fond de couleurs changable ou transparente
+172. La gestion de forme dans le rubrique Gestion des objets doit etre dans un bloc 4 : Forme
+173. c'est quoi le token : 79%
+174. je parle de ça : Fenêtre de contexte...
+175. je pas compris
+176. Est-ce que Codex va s'arreter pour m'aider à coder plus une fois atteint le 258 ?
+177. Bien. Tu peux me rassemble tout mes message sous forme d'un script et enregistre en forma txt
+
+NOTE:
+- Fichier genere a partir des messages visibles dans cette session.
+- Certaines lignes sont raccourcies pour rester lisibles tout en gardant le sens.

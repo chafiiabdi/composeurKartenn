@@ -13,6 +13,9 @@ const legendPanel = document.querySelector(".carto-legend-panel");
 const legendResizer = document.getElementById("legendResizer");
 const legendAddSectionButton = document.getElementById("legendAddSection");
 const legendResetButton = document.getElementById("legendReset");
+const legendMoveUpButton = document.getElementById("legendMoveUp");
+const legendMoveDownButton = document.getElementById("legendMoveDown");
+const legendRenameSectionButton = document.getElementById("legendRenameSection");
 const stageLayout = document.querySelector(".carto-stage-layout");
 const mainContent = document.getElementById("main-content");
 const layersList = document.getElementById("layersList");
@@ -33,6 +36,15 @@ const selectedFontFamily = document.getElementById("selectedFontFamily");
 const toggleBoldButton = document.getElementById("toggleBold");
 const toggleItalicButton = document.getElementById("toggleItalic");
 const toggleTransparentBackgroundButton = document.getElementById("toggleTransparentBackground");
+const legendSelectionHint = document.getElementById("legendSelectionHint");
+const legendSelectedText = document.getElementById("legendSelectedText");
+const legendSelectedFontSize = document.getElementById("legendSelectedFontSize");
+const legendSelectedTextColor = document.getElementById("legendSelectedTextColor");
+const legendSelectedTextBackground = document.getElementById("legendSelectedTextBackground");
+const legendSelectedFontFamily = document.getElementById("legendSelectedFontFamily");
+const legendToggleBoldButton = document.getElementById("legendToggleBold");
+const legendToggleItalicButton = document.getElementById("legendToggleItalic");
+const legendToggleTransparentBackgroundButton = document.getElementById("legendToggleTransparentBackground");
 const selectedWidth = document.getElementById("selectedWidth");
 const selectedHeight = document.getElementById("selectedHeight");
 const selectedRotation = document.getElementById("selectedRotation");
@@ -52,6 +64,7 @@ const closeDisplaySettingsButton = document.getElementById("closeDisplaySettings
 const displaySettings = document.getElementById("displaySettings");
 const displaySettingsBackdrop = document.getElementById("displaySettingsBackdrop");
 const addButtons = document.querySelectorAll("[data-add]");
+const shapeButtons = document.querySelectorAll("[data-shape]");
 const pictoLibrary = document.getElementById("pictoLibrary");
 const toolboxSearch = document.getElementById("toolboxSearch");
 const toolboxMenuButtons = document.querySelectorAll("[data-toolbox-target]");
@@ -75,12 +88,27 @@ const pictoCatalog = {
 };
 
 const favoritePictoKeys = ["administration", "information", "alerte", "territoire"];
+const shapeCatalog = {
+  rectangle: { label: "Rectangle" },
+  ellipse: { label: "Ellipse" },
+  triangle: { label: "Triangle" },
+  diamond: { label: "Losange" },
+  line: { label: "Ligne" },
+  "arrow-right": { label: "Fleche" },
+  "black-bar": { label: "Trait noir" },
+  "bubble-left": { label: "Bulle gauche" },
+  "bubble-bottom": { label: "Bulle bas" },
+  "callout-rect-left": { label: "Encadre gauche" },
+  "callout-rect-right": { label: "Encadre droite" },
+  "notch-top": { label: "Encoche haut" },
+  "notch-bottom": { label: "Encoche bas" },
+};
 
 const layers = [
   { id: "map-base", type: "map", label: "Carte importee", locked: false, visible: true, listed: true },
   { id: "title-base", type: "title", label: "Titre principal", locked: false, visible: true, listed: true },
-  { id: "source-base", type: "source", label: "Mention source", locked: false, visible: true, listed: true },
-  { id: "north-base", type: "north", label: "Orientation", locked: false, visible: true, listed: true },
+  { id: "source-base", type: "source", label: "Mention source", locked: false, visible: false, listed: false },
+  { id: "north-base", type: "north", label: "Orientation", locked: false, visible: false, listed: false },
 ];
 
 const ZOOM_BASELINE = 1.8; // Old 180% becomes new 100%
@@ -396,11 +424,56 @@ function initializeLegendToolbar() {
     renderLegend();
     refreshSelectedControls();
   });
+
+  legendMoveUpButton?.addEventListener("click", () => {
+    if (!legendSelection?.sectionId) {
+      return;
+    }
+    const groupIndex = legendSectionsState.findIndex((group) => group.id === legendSelection.sectionId);
+    if (groupIndex <= 0) {
+      return;
+    }
+    const [sectionState] = legendSectionsState.splice(groupIndex, 1);
+    legendSectionsState.splice(groupIndex - 1, 0, sectionState);
+    renderLegend();
+    refreshSelectedControls();
+  });
+
+  legendMoveDownButton?.addEventListener("click", () => {
+    if (!legendSelection?.sectionId) {
+      return;
+    }
+    const groupIndex = legendSectionsState.findIndex((group) => group.id === legendSelection.sectionId);
+    if (groupIndex === -1 || groupIndex >= legendSectionsState.length - 1) {
+      return;
+    }
+    const [sectionState] = legendSectionsState.splice(groupIndex, 1);
+    legendSectionsState.splice(groupIndex + 1, 0, sectionState);
+    renderLegend();
+    refreshSelectedControls();
+  });
+
+  legendRenameSectionButton?.addEventListener("click", () => {
+    if (!legendSelection?.sectionId) {
+      return;
+    }
+    const section = legendSectionsState.find((group) => group.id === legendSelection.sectionId);
+    if (!section) {
+      return;
+    }
+    const nextName = prompt("Nom du sous-bloc :", section.title);
+    if (!nextName) {
+      return;
+    }
+    section.title = nextName.trim() || section.title;
+    renderLegend();
+    refreshSelectedControls();
+  });
 }
 
 
 function isRotatableLayer(layer) {
-  return Boolean(layer && ["title", "source", "text"].includes(layer.type));
+  return Boolean(layer && ["title", "source", "text", "shape"].includes(layer.type));
 }
 
 function snapshotState() {
@@ -436,6 +509,14 @@ function snapshotState() {
             fontWeight: element.dataset.textFontWeight,
             fontStyle: element.dataset.textFontStyle,
             bgTransparent: element.dataset.bgTransparent === "true",
+          }
+          : null,
+        shapeStyle: element && isShapeStyleLayer(layer)
+          ? {
+            fillColor: element.dataset.shapeFill,
+            strokeColor: element.dataset.shapeStroke,
+            fillTransparent: element.dataset.shapeTransparent === "true",
+            shapeType: element.dataset.shapeType || "",
           }
           : null,
         rotation: element ? (element.dataset.rotation || "") : "",
@@ -474,6 +555,7 @@ function restoreState(state) {
       visible: layerState.visible,
       listed: layerState.listed,
       src: layerState.src,
+      shapeType: layerState.shapeType,
     });
 
     let element = getElementByLayerId(layerState.id);
@@ -482,6 +564,9 @@ function restoreState(state) {
       element.className = `board-element board-element--${layerState.type}`;
       element.dataset.layerId = layerState.id;
       element.dataset.type = layerState.type;
+      if (layerState.shapeStyle?.shapeType) {
+        element.dataset.shapeType = layerState.shapeStyle.shapeType;
+      }
       element.innerHTML = layerState.html;
       board.appendChild(element);
       attachElementEvents(element);
@@ -498,6 +583,12 @@ function restoreState(state) {
       element.classList.toggle("is-locked", !!layerState.locked);
       if (layerState.textStyle && isTextStyleLayer(layerState)) {
         initializeTextStyleState(layerState.id, layerState.textStyle);
+      }
+      if (layerState.shapeStyle && isShapeStyleLayer(layerState)) {
+        if (layerState.shapeStyle.shapeType) {
+          element.dataset.shapeType = layerState.shapeStyle.shapeType;
+        }
+        initializeShapeStyleState(layerState.id, layerState.shapeStyle);
       }
       if (layerState.rotation) {
         element.dataset.rotation = layerState.rotation;
@@ -592,6 +683,101 @@ function getSourceTextNode(element) {
 
 function isTextStyleLayer(layer) {
   return Boolean(layer && ["title", "source", "text"].includes(layer.type));
+}
+
+function isShapeStyleLayer(layer) {
+  return Boolean(layer && layer.type === "shape");
+}
+
+function getDefaultShapeStyle(shapeType = "rectangle") {
+  if (shapeType === "black-bar") {
+    return {
+      fillColor: "#000000",
+      strokeColor: "#000000",
+      fillTransparent: false,
+    };
+  }
+
+  if (["line", "arrow-right"].includes(shapeType)) {
+    return {
+      fillColor: "#000091",
+      strokeColor: "#000091",
+      fillTransparent: false,
+    };
+  }
+
+  if (["bubble-left", "bubble-bottom", "callout-rect-left", "callout-rect-right", "notch-top", "notch-bottom"].includes(shapeType)) {
+    return {
+      fillColor: "#ffffff",
+      strokeColor: "#000091",
+      fillTransparent: false,
+    };
+  }
+
+  return {
+    fillColor: "rgba(0, 0, 145, 0.18)",
+    strokeColor: "#000091",
+    fillTransparent: false,
+  };
+}
+
+function initializeShapeStyleState(layerId, overrides = {}) {
+  const layer = getLayer(layerId);
+  const element = getElementByLayerId(layerId);
+  if (!layer || !element || !isShapeStyleLayer(layer)) {
+    return;
+  }
+
+  const shapeType = element.dataset.shapeType || "rectangle";
+  const defaults = { ...getDefaultShapeStyle(shapeType), ...overrides };
+  element.dataset.shapeFill = defaults.fillColor;
+  element.dataset.shapeStroke = defaults.strokeColor;
+  element.dataset.shapeTransparent = defaults.fillTransparent ? "true" : "false";
+  syncShapeStylePresentation(layerId);
+}
+
+function getShapeStyleState(layerId) {
+  const layer = getLayer(layerId);
+  const element = getElementByLayerId(layerId);
+  if (!layer || !element || !isShapeStyleLayer(layer)) {
+    return null;
+  }
+
+  const shapeType = element.dataset.shapeType || "rectangle";
+  const defaults = getDefaultShapeStyle(shapeType);
+  return {
+    fillColor: element.dataset.shapeFill || defaults.fillColor,
+    strokeColor: element.dataset.shapeStroke || defaults.strokeColor,
+    fillTransparent: (element.dataset.shapeTransparent || String(defaults.fillTransparent)) === "true",
+  };
+}
+
+function syncShapeStylePresentation(layerId) {
+  const layer = getLayer(layerId);
+  const element = getElementByLayerId(layerId);
+  const shapeState = getShapeStyleState(layerId);
+  if (!layer || !element || !shapeState || !isShapeStyleLayer(layer)) {
+    return;
+  }
+
+  const fill = shapeState.fillTransparent ? "transparent" : shapeState.fillColor;
+  setInlineStyle(element, "--shape-fill", fill);
+  setInlineStyle(element, "--shape-stroke", shapeState.strokeColor || "#000091");
+}
+
+function applyShapeStylesToElement(layerId, nextStyle = {}) {
+  const layer = getLayer(layerId);
+  const element = getElementByLayerId(layerId);
+  if (!layer || !element || !isShapeStyleLayer(layer)) {
+    return;
+  }
+
+  const currentState = getShapeStyleState(layerId);
+  const merged = { ...currentState, ...nextStyle };
+  element.dataset.shapeFill = merged.fillColor;
+  element.dataset.shapeStroke = merged.strokeColor || "#000091";
+  element.dataset.shapeTransparent = merged.fillTransparent ? "true" : "false";
+  syncShapeStylePresentation(layerId);
 }
 
 function toHexColor(color) {
@@ -884,6 +1070,9 @@ function applyLayerOrder() {
       element.style.zIndex = String(index + 1);
       setLayerLockedVisual(layer.id);
       applyTextLayout(layer.id);
+      if (isShapeStyleLayer(layer)) {
+        syncShapeStylePresentation(layer.id);
+      }
     }
   });
 }
@@ -1084,7 +1273,7 @@ function getLegendEntries() {
 function ensureLegendBaseSections() {
   if (!legendSectionsState.length) {
     legendSectionsState = [
-      createLegendSection("Symboles cartographiques", "picto"),
+      createLegendSection("groupe", "picto"),
     ];
   }
 }
@@ -1255,7 +1444,7 @@ function renderLegend() {
   legendHint.textContent = "";
   legendHint.hidden = true;
 
-  groups.forEach((group, groupIndex) => {
+  groups.forEach((group) => {
     const section = document.createElement("section");
     section.className = "carto-legend-section";
     section.dataset.sectionId = group.id;
@@ -1277,55 +1466,7 @@ function renderLegend() {
       title.classList.add("is-selected");
     }
 
-    const actions = document.createElement("div");
-    actions.className = "carto-legend-section__actions";
-
-    const upButton = document.createElement("button");
-    upButton.type = "button";
-    upButton.className = "carto-legend-section__action";
-    upButton.textContent = "U";
-    upButton.title = "Monter";
-    upButton.disabled = groupIndex === 0;
-    upButton.addEventListener("click", () => {
-      const next = clamp(groupIndex - 1, 0, legendSectionsState.length - 1);
-      if (next !== groupIndex) {
-        const [sectionState] = legendSectionsState.splice(groupIndex, 1);
-        legendSectionsState.splice(next, 0, sectionState);
-        renderLegend();
-      }
-    });
-
-    const downButton = document.createElement("button");
-    downButton.type = "button";
-    downButton.className = "carto-legend-section__action";
-    downButton.textContent = "D";
-    downButton.title = "Descendre";
-    downButton.disabled = groupIndex === legendSectionsState.length - 1;
-    downButton.addEventListener("click", () => {
-      const next = clamp(groupIndex + 1, 0, legendSectionsState.length - 1);
-      if (next !== groupIndex) {
-        const [sectionState] = legendSectionsState.splice(groupIndex, 1);
-        legendSectionsState.splice(next, 0, sectionState);
-        renderLegend();
-      }
-    });
-
-    const renameButton = document.createElement("button");
-    renameButton.type = "button";
-    renameButton.className = "carto-legend-section__action";
-    renameButton.textContent = "R";
-    renameButton.title = "Renommer";
-    renameButton.addEventListener("click", () => {
-      const nextName = prompt("Nom du sous-bloc :", group.title);
-      if (!nextName) {
-        return;
-      }
-      group.title = nextName.trim() || group.title;
-      renderLegend();
-    });
-
-    actions.append(upButton, downButton, renameButton);
-    titleRow.append(title, actions);
+    titleRow.append(title);
 
     const body = document.createElement("div");
     body.className = "carto-legend-section__body";
@@ -1420,6 +1561,7 @@ function renderLayers() {
     block1: [],
     block2: [],
     block3: [],
+    block4: [],
   };
 
   [...layers].reverse().filter((layer) => isLayerListed(layer)).forEach((layer) => {
@@ -1435,6 +1577,11 @@ function renderLayers() {
 
     if (layer.type === "picto") {
       groupedLayers.block3.push(layer);
+      return;
+    }
+
+    if (layer.type === "shape") {
+      groupedLayers.block4.push(layer);
     }
   });
 
@@ -1442,6 +1589,7 @@ function renderLayers() {
     { key: "block1", title: "Bloc 1 : Titre, orientation, source", hint: "Habillage principal" },
     { key: "block2", title: "Bloc 2 : Textes libres", hint: "Tous les textes libres" },
     { key: "block3", title: "Bloc 3 : Pictogrammes", hint: "Tous les pictogrammes poses" },
+    { key: "block4", title: "Bloc 4 : Forme", hint: "Toutes les formes posees" },
   ];
 
   groups.forEach((group) => {
@@ -1594,6 +1742,8 @@ function buildCopiedLayerPayload(layerId) {
     type: layer.type,
     label: layer.label,
     src: layer.src || "",
+    shapeType: element.dataset.shapeType || "",
+    shapeStyle: isShapeStyleLayer(layer) ? getShapeStyleState(layer.id) : null,
     html: element.innerHTML,
     left: parseFloat(element.style.left || "0"),
     top: parseFloat(element.style.top || "0"),
@@ -1614,6 +1764,9 @@ function pasteCopiedLayer() {
   element.className = `board-element board-element--${payload.type}`;
   element.dataset.layerId = layerId;
   element.dataset.type = payload.type;
+  if (payload.shapeType) {
+    element.dataset.shapeType = payload.shapeType;
+  }
   element.style.left = `${clamp(payload.left + 2, 0, 90)}%`;
   element.style.top = `${clamp(payload.top + 2, 0, 90)}%`;
   element.style.width = `${payload.width}%`;
@@ -1629,10 +1782,15 @@ function pasteCopiedLayer() {
     type: payload.type,
     label: payload.label,
     src: payload.src || undefined,
+    shapeType: payload.shapeType || undefined,
     locked: false,
     visible: true,
     listed: true,
   });
+
+  if (payload.shapeStyle && payload.type === "shape") {
+    initializeShapeStyleState(layerId, payload.shapeStyle);
+  }
 
   applyLayerOrder();
   renderLayers();
@@ -1699,6 +1857,39 @@ function syncBaseTexts() {
   refreshSelectedControls();
 }
 
+function refreshLegendManagerControls(styleState = null, enabled = false, textValue = "", hint = "Selectionnez un titre de sous-bloc ou un libelle de picto dans la legende.") {
+  if (!legendSelectedText) {
+    return;
+  }
+
+  legendSelectionHint.textContent = hint;
+  legendSelectedText.value = textValue;
+  legendSelectedFontSize.value = String(styleState?.fontSize || 13);
+  legendSelectedTextColor.value = styleState?.textColor || "#161616";
+  legendSelectedTextBackground.value = styleState?.backgroundColor || "#ffffff";
+  legendSelectedFontFamily.value = styleState?.fontFamily || "Marianne, Arial, sans-serif";
+
+  legendSelectedText.disabled = !enabled;
+  legendSelectedFontSize.disabled = !enabled;
+  legendSelectedTextColor.disabled = !enabled;
+  legendSelectedTextBackground.disabled = !enabled;
+  legendSelectedFontFamily.disabled = !enabled;
+  legendToggleBoldButton.disabled = !enabled;
+  legendToggleItalicButton.disabled = !enabled;
+  legendToggleTransparentBackgroundButton.disabled = !enabled;
+
+  legendToggleBoldButton.classList.toggle("is-active", enabled && Number(styleState?.fontWeight || 400) >= 600);
+  legendToggleItalicButton.classList.toggle("is-active", enabled && styleState?.fontStyle === "italic");
+  legendToggleTransparentBackgroundButton.classList.toggle("is-active", enabled && Boolean(styleState?.bgTransparent));
+
+  const selectedSectionId = legendSelection?.sectionId || "";
+  const selectedSectionIndex = selectedSectionId ? legendSectionsState.findIndex((section) => section.id === selectedSectionId) : -1;
+  const hasSectionSelection = selectedSectionIndex !== -1;
+  legendMoveUpButton.disabled = !hasSectionSelection || selectedSectionIndex <= 0;
+  legendMoveDownButton.disabled = !hasSectionSelection || selectedSectionIndex >= legendSectionsState.length - 1;
+  legendRenameSectionButton.disabled = !hasSectionSelection;
+}
+
 function refreshSelectedControls() {
   if (legendSelection) {
     const styleState = getLegendSelectionStyleState();
@@ -1715,13 +1906,16 @@ function refreshSelectedControls() {
     if (legendSelection.kind === "section-title") {
       selectionHint.textContent = `Legende : sous-bloc "${section.title}" selectionne.`;
       selectedText.value = section.title;
+      refreshLegendManagerControls(styleState, true, section.title, `Legende : sous-bloc "${section.title}" selectionne.`);
     } else if (legendSelection.kind === "item-label") {
       const selectedItem = section.items.find((item) => item.key === legendSelection.itemKey);
       selectionHint.textContent = `Legende : element "${selectedItem?.label || ""}" selectionne.`;
       selectedText.value = selectedItem?.label || "";
+      refreshLegendManagerControls(styleState, true, selectedItem?.label || "", `Legende : element "${selectedItem?.label || ""}" selectionne.`);
     } else {
       selectionHint.textContent = `Legende : fond du sous-bloc "${section.title}" selectionne.`;
       selectedText.value = "";
+      refreshLegendManagerControls(styleState, false, "", `Legende : fond du sous-bloc "${section.title}" selectionne. Le texte n'est pas editable pour ce mode.`);
     }
 
     selectedFontSize.value = String(styleState.fontSize || 13);
@@ -1761,6 +1955,7 @@ function refreshSelectedControls() {
   const isTextStyleEditable = isMultiSelection
     ? textStyleTargetLayers.length > 0
     : isEditable && !isLocked && isTextStyleLayer(layer);
+  const isShapeStyleEditable = !isMultiSelection && isEditable && !isLocked && isShapeStyleLayer(layer);
   const isRotationEditable = isMultiSelection
     ? rotationTargetLayers.length > 0
     : isEditable && !isLocked && isRotatableLayer(layer);
@@ -1788,6 +1983,7 @@ function refreshSelectedControls() {
     sendBackwardButton.disabled = true;
     deleteLayerButton.disabled = true;
     updateTextStyleButtons(null, true);
+    refreshLegendManagerControls(null, false, "");
     return;
   }
 
@@ -1829,9 +2025,12 @@ function refreshSelectedControls() {
   const styleState = isMultiSelection && textStyleTargetLayers.length
     ? getTextStyleState(textStyleTargetLayers[0].id)
     : getTextStyleState(layer.id);
+  const shapeStyleState = !isMultiSelection ? getShapeStyleState(layer.id) : null;
   selectedFontSize.value = String(styleState?.fontSize || 28);
   selectedTextColor.value = styleState?.textColor || "#000000";
-  selectedTextBackground.value = styleState?.backgroundColor || "#ffffff";
+  selectedTextBackground.value = shapeStyleState
+    ? toHexColor(shapeStyleState.fillColor)
+    : styleState?.backgroundColor || "#ffffff";
   selectedFontFamily.value = styleState?.fontFamily || "Marianne, Arial, sans-serif";
   if (isMultiSelection && rotationTargetLayers.length) {
     const firstRotationElement = getElementByLayerId(rotationTargetLayers[0].id);
@@ -1843,19 +2042,26 @@ function refreshSelectedControls() {
   selectedText.disabled = isMultiSelection || !isEditable || isLocked || layer.type === "map";
   selectedFontSize.disabled = !isTextStyleEditable;
   selectedTextColor.disabled = !isTextStyleEditable;
-  selectedTextBackground.disabled = !isTextStyleEditable;
+  selectedTextBackground.disabled = !(isTextStyleEditable || isShapeStyleEditable);
   selectedFontFamily.disabled = !isTextStyleEditable;
   selectedRotation.disabled = !isRotationEditable;
   legendColumns.value = "1";
   legendSymbolSize.value = "20";
   legendColumns.disabled = true;
   legendSymbolSize.disabled = true;
-  updateTextStyleButtons(styleState, !isTextStyleEditable);
+  if (isShapeStyleEditable) {
+    updateTextStyleButtons({ bgTransparent: shapeStyleState?.fillTransparent }, false);
+    toggleBoldButton.disabled = true;
+    toggleItalicButton.disabled = true;
+  } else {
+    updateTextStyleButtons(styleState, !isTextStyleEditable);
+  }
   selectedWidth.disabled = !resizeTargetLayers.length;
   selectedHeight.disabled = !resizeTargetLayers.length;
   bringForwardButton.disabled = isMultiSelection || !isEditable || isLocked;
   sendBackwardButton.disabled = isMultiSelection || !isEditable || isLocked;
   deleteLayerButton.disabled = isMultiSelection ? !selectedLayers.some((selected) => !["map", "title", "source", "north"].includes(selected.type)) : !isDeletable;
+  refreshLegendManagerControls(null, false, "");
 }
 
 function updateLegendLayoutStyle(nextLayout) {
@@ -2070,6 +2276,45 @@ function createTextElement() {
   selectLayer(layerId);
 }
 
+function createShapeElement(shapeType) {
+  const shapeConfig = shapeCatalog[shapeType];
+  if (!shapeConfig) {
+    return;
+  }
+
+  pushHistory();
+  customIndex += 1;
+  const layerId = `shape-${customIndex}`;
+  const element = document.createElement("div");
+  element.className = "board-element board-element--shape";
+  element.dataset.layerId = layerId;
+  element.dataset.type = "shape";
+  element.dataset.shapeType = shapeType;
+  element.style.left = `${22 + customIndex * 1.2}%`;
+  element.style.top = `${22 + customIndex * 1.2}%`;
+  element.style.width = ["line", "black-bar"].includes(shapeType) ? "22%" : "10%";
+  element.style.height = ["line", "black-bar"].includes(shapeType) ? "2.4%" : "10%";
+  element.innerHTML = `<span class="board-shape board-shape--${shapeType}" aria-hidden="true"></span>`;
+
+  board.appendChild(element);
+  attachElementEvents(element);
+
+  layers.push({
+    id: layerId,
+    type: "shape",
+    label: shapeConfig.label,
+    shapeType,
+    locked: false,
+    visible: true,
+    listed: true,
+  });
+
+  initializeShapeStyleState(layerId);
+  applyLayerOrder();
+  renderLayers();
+  selectLayer(layerId);
+}
+
 function cloneBaseLayer(type) {
   if (type === "text") {
     createTextElement();
@@ -2235,6 +2480,27 @@ function updateSelectedTextStyle(nextStyle) {
       sanitizedStyle.fontSize = clamp(sanitizedStyle.fontSize, 4, 72);
     }
     updateLegendSelectionStyle(sanitizedStyle);
+    return;
+  }
+
+  const selectedLayers = getUnlockedSelectedLayers();
+  const shapeLayers = selectedLayers.filter((layer) => isShapeStyleLayer(layer));
+  if (shapeLayers.length && !selectedLayers.some((layer) => isTextStyleLayer(layer))) {
+    pushHistory();
+    shapeLayers.forEach((layer) => {
+      const shapeNext = {};
+      if (typeof nextStyle.backgroundColor !== "undefined") {
+        shapeNext.fillColor = nextStyle.backgroundColor;
+        if (typeof nextStyle.bgTransparent === "undefined") {
+          shapeNext.fillTransparent = false;
+        }
+      }
+      if (typeof nextStyle.bgTransparent !== "undefined") {
+        shapeNext.fillTransparent = nextStyle.bgTransparent;
+      }
+      applyShapeStylesToElement(layer.id, shapeNext);
+    });
+    refreshSelectedControls();
     return;
   }
 
@@ -2974,6 +3240,115 @@ async function drawElementsOnCanvas(context, boardRect, canvas) {
       continue;
     }
 
+    if (layer.type === "shape") {
+      const shapeType = element.dataset.shapeType || "rectangle";
+      const shapeStyle = getShapeStyleState(layer.id);
+      const fillColor = shapeStyle?.fillTransparent ? "transparent" : (shapeStyle?.fillColor || "rgba(0, 0, 145, 0.22)");
+      const strokeColor = shapeStyle?.strokeColor || "#000091";
+      context.save();
+      context.translate(x + width / 2, y + height / 2);
+      const rotation = Number(element.dataset.rotation || "0");
+      context.rotate((rotation * Math.PI) / 180);
+      context.fillStyle = fillColor;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 1;
+
+      if (shapeType === "ellipse") {
+        context.beginPath();
+        context.ellipse(0, 0, width / 2, height / 2, 0, 0, Math.PI * 2);
+        context.fill();
+        context.stroke();
+      } else if (shapeType === "triangle") {
+        context.beginPath();
+        context.moveTo(0, -height / 2);
+        context.lineTo(-width / 2, height / 2);
+        context.lineTo(width / 2, height / 2);
+        context.closePath();
+        context.fill();
+        context.stroke();
+      } else if (shapeType === "diamond") {
+        context.beginPath();
+        context.moveTo(0, -height / 2);
+        context.lineTo(width / 2, 0);
+        context.lineTo(0, height / 2);
+        context.lineTo(-width / 2, 0);
+        context.closePath();
+        context.fill();
+        context.stroke();
+      } else if (shapeType === "line") {
+        context.fillStyle = fillColor === "transparent" ? strokeColor : fillColor;
+        context.fillRect(-width / 2, -1, width, 2);
+      } else if (shapeType === "black-bar") {
+        context.fillStyle = fillColor === "transparent" ? "#000000" : fillColor;
+        context.fillRect(-width / 2, -height / 2, width, height);
+      } else if (shapeType === "bubble-left" || shapeType === "bubble-bottom") {
+        context.beginPath();
+        context.ellipse(0, 0, width / 2, height / 2, 0, 0, Math.PI * 2);
+        context.fillStyle = fillColor;
+        context.fill();
+        context.stroke();
+        context.beginPath();
+        if (shapeType === "bubble-left") {
+          context.moveTo(-width * 0.5, height * 0.1);
+          context.lineTo(-width * 0.62, height * 0.28);
+          context.lineTo(-width * 0.44, height * 0.26);
+        } else {
+          context.moveTo(width * 0.02, height * 0.48);
+          context.lineTo(width * 0.16, height * 0.66);
+          context.lineTo(width * 0.26, height * 0.44);
+        }
+        context.closePath();
+        context.fillStyle = fillColor;
+        context.fill();
+        context.stroke();
+      } else if (shapeType === "callout-rect-left" || shapeType === "callout-rect-right" || shapeType === "notch-top" || shapeType === "notch-bottom") {
+        context.fillStyle = fillColor;
+        context.fillRect(-width / 2, -height / 2, width, height);
+        context.strokeRect(-width / 2, -height / 2, width, height);
+        context.beginPath();
+        if (shapeType === "callout-rect-left") {
+          context.moveTo(-width / 2, height * 0.1);
+          context.lineTo(-width * 0.64, height * 0.24);
+          context.lineTo(-width / 2, height * 0.32);
+        } else if (shapeType === "callout-rect-right") {
+          context.moveTo(width / 2, height * 0.1);
+          context.lineTo(width * 0.64, height * 0.24);
+          context.lineTo(width / 2, height * 0.32);
+        } else if (shapeType === "notch-top") {
+          context.moveTo(-width * 0.08, -height / 2);
+          context.lineTo(0, -height * 0.7);
+          context.lineTo(width * 0.08, -height / 2);
+        } else {
+          context.moveTo(-width * 0.08, height / 2);
+          context.lineTo(0, height * 0.7);
+          context.lineTo(width * 0.08, height / 2);
+        }
+        context.closePath();
+        context.fillStyle = fillColor;
+        context.fill();
+        context.stroke();
+      } else if (shapeType === "arrow-right") {
+        const arrowWidth = width;
+        const arrowHeight = height;
+        context.fillStyle = "#000091";
+        context.beginPath();
+        context.moveTo(-arrowWidth / 2, -arrowHeight * 0.15);
+        context.lineTo(arrowWidth * 0.2, -arrowHeight * 0.15);
+        context.lineTo(arrowWidth * 0.2, -arrowHeight * 0.35);
+        context.lineTo(arrowWidth / 2, 0);
+        context.lineTo(arrowWidth * 0.2, arrowHeight * 0.35);
+        context.lineTo(arrowWidth * 0.2, arrowHeight * 0.15);
+        context.lineTo(-arrowWidth / 2, arrowHeight * 0.15);
+        context.closePath();
+        context.fill();
+      } else {
+        context.fillRect(-width / 2, -height / 2, width, height);
+        context.strokeRect(-width / 2, -height / 2, width, height);
+      }
+      context.restore();
+      continue;
+    }
+
     if (layer.type === "north") {
       context.fillStyle = "#000091";
       context.font = "700 34px sans-serif";
@@ -3141,6 +3516,13 @@ selectedText.addEventListener("input", (event) => {
   updateSelectedText(event.target.value);
 });
 
+legendSelectedText?.addEventListener("input", (event) => {
+  if (!legendSelection) {
+    return;
+  }
+  updateLegendSelectionText(event.target.value);
+});
+
 ["input", "change"].forEach((eventName) => {
   selectedFontSize.addEventListener(eventName, (event) => {
     updateSelectedTextStyle({ fontSize: Number(event.target.value) });
@@ -3158,6 +3540,37 @@ selectedText.addEventListener("input", (event) => {
   });
 
   selectedFontFamily.addEventListener(eventName, (event) => {
+    updateSelectedTextStyle({ fontFamily: event.target.value });
+  });
+
+  legendSelectedFontSize?.addEventListener(eventName, (event) => {
+    if (!legendSelection) {
+      return;
+    }
+    updateSelectedTextStyle({ fontSize: Number(event.target.value) });
+  });
+
+  legendSelectedTextColor?.addEventListener(eventName, (event) => {
+    if (!legendSelection) {
+      return;
+    }
+    updateSelectedTextStyle({ textColor: event.target.value });
+  });
+
+  legendSelectedTextBackground?.addEventListener(eventName, (event) => {
+    if (!legendSelection) {
+      return;
+    }
+    updateSelectedTextStyle({
+      backgroundColor: event.target.value,
+      bgTransparent: false,
+    });
+  });
+
+  legendSelectedFontFamily?.addEventListener(eventName, (event) => {
+    if (!legendSelection) {
+      return;
+    }
     updateSelectedTextStyle({ fontFamily: event.target.value });
   });
 });
@@ -3179,7 +3592,55 @@ toggleItalicButton.addEventListener("click", () => {
 });
 
 toggleTransparentBackgroundButton.addEventListener("click", () => {
-  const styleState = legendSelection ? getLegendSelectionStyleState() : getTextStyleState(selectedLayerId);
+  if (legendSelection) {
+    const legendStyle = getLegendSelectionStyleState();
+    if (!legendStyle) {
+      return;
+    }
+    updateSelectedTextStyle({ bgTransparent: !legendStyle.bgTransparent });
+    return;
+  }
+
+  const shapeState = getShapeStyleState(selectedLayerId);
+  if (shapeState) {
+    updateSelectedTextStyle({ bgTransparent: !shapeState.fillTransparent });
+    return;
+  }
+
+  const textStyle = getTextStyleState(selectedLayerId);
+  if (!textStyle) {
+    return;
+  }
+  updateSelectedTextStyle({ bgTransparent: !textStyle.bgTransparent });
+});
+
+legendToggleBoldButton?.addEventListener("click", () => {
+  if (!legendSelection) {
+    return;
+  }
+  const styleState = getLegendSelectionStyleState();
+  if (!styleState) {
+    return;
+  }
+  updateSelectedTextStyle({ fontWeight: Number(styleState.fontWeight) >= 600 ? "400" : "700" });
+});
+
+legendToggleItalicButton?.addEventListener("click", () => {
+  if (!legendSelection) {
+    return;
+  }
+  const styleState = getLegendSelectionStyleState();
+  if (!styleState) {
+    return;
+  }
+  updateSelectedTextStyle({ fontStyle: styleState.fontStyle === "italic" ? "normal" : "italic" });
+});
+
+legendToggleTransparentBackgroundButton?.addEventListener("click", () => {
+  if (!legendSelection) {
+    return;
+  }
+  const styleState = getLegendSelectionStyleState();
   if (!styleState) {
     return;
   }
@@ -3229,6 +3690,12 @@ zoomOutButton.addEventListener("click", () => {
 addButtons.forEach((button) => {
   button.addEventListener("click", () => {
     cloneBaseLayer(button.dataset.add);
+  });
+});
+
+shapeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    createShapeElement(button.dataset.shape);
   });
 });
 

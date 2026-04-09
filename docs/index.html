@@ -48,9 +48,7 @@
 
     <main class="fr-container--fluid carto-main" id="main-content">
       <aside class="carto-panel carto-panel--left" id="leftPanel">
-        <button class="carto-panel-toggle" type="button" id="leftPanelToggle" aria-controls="leftPanel" aria-expanded="true" aria-label="Replier la boite a outils">
-          <span class="carto-panel-toggle__icon" aria-hidden="true">‹</span>
-        </button>
+        
         <section class="fr-card fr-card--no-arrow carto-card">
           <div class="fr-card__body">
             <div class="fr-card__content">
@@ -80,8 +78,9 @@
               <div class="carto-toolbox__group">
                 <p class="carto-toolbox__group-title">Rubriques standards</p>
                 <div class="carto-toolbox__menu carto-toolbox__menu--side">
-                  <button class="carto-toolbox__menu-btn is-active" type="button" data-toolbox-target="habillagePanel">Habillage</button>
+                  <button class="carto-toolbox__menu-btn is-active" type="button" data-toolbox-target="habillagePanel">Titre & Texte</button>
                   <button class="carto-toolbox__menu-btn" type="button" data-toolbox-target="pictogrammesPanel">Pictogrammes</button>
+                  <button class="carto-toolbox__menu-btn" type="button" data-toolbox-target="formesPanel">Formes</button>
                 </div>
               </div>
 
@@ -95,11 +94,11 @@
                     <label class="fr-label" for="subtitleInput">Sous-titre</label>
                     <input class="fr-input" id="subtitleInput" type="text" value="Sous-titre ou precision territoriale">
                   </div>
-                  <div class="fr-input-group">
+                  <div class="fr-input-group" hidden>
                     <label class="fr-label" for="sourceInput">Source</label>
                     <input class="fr-input" id="sourceInput" type="text" value="Source : a completer">
                   </div>
-                  <div class="fr-input-group">
+                  <div class="fr-input-group" hidden>
                     <label class="fr-label" for="northLabelInput">Orientation</label>
                     <input class="fr-input" id="northLabelInput" type="text" value="N">
                   </div>
@@ -159,6 +158,73 @@
                   <div class="carto-picto-grid" id="favoritePictos"></div>
                 </div>
               </section>
+
+              <section class="carto-toolbox__panel" id="formesPanel">
+                <div class="carto-section-head">
+                  <div>
+                    <h3 class="fr-h6">Formes</h3>
+                    <p class="fr-text--xs carto-muted">Formes type PowerPoint pretes a poser sur la carte</p>
+                  </div>
+                </div>
+                <p class="carto-toolbox__group-title">Bulles et legendes</p>
+                <div class="carto-shape-grid">
+                  <button class="carto-shape-btn" type="button" data-shape="rectangle">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--rectangle" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Rectangle</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="ellipse">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--ellipse" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Ellipse</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="triangle">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--triangle" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Triangle</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="diamond">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--diamond" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Losange</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="line">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--line" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Ligne</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="arrow-right">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--arrow-right" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Fleche</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="black-bar">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--black-bar" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Trait noir</span>
+                  </button>
+                </div>
+                <p class="carto-toolbox__group-title">Callouts legendes</p>
+                <div class="carto-shape-grid">
+                  <button class="carto-shape-btn" type="button" data-shape="bubble-left">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--bubble-left" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Bulle gauche</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="bubble-bottom">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--bubble-bottom" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Bulle bas</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="callout-rect-left">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--callout-rect-left" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Encadre g.</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="callout-rect-right">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--callout-rect-right" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Encadre d.</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="notch-top">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--notch-top" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Encoche haut</span>
+                  </button>
+                  <button class="carto-shape-btn" type="button" data-shape="notch-bottom">
+                    <span class="carto-shape-btn__icon carto-shape-btn__icon--notch-bottom" aria-hidden="true"></span>
+                    <span class="carto-shape-btn__label">Encoche bas</span>
+                  </button>
+                </div>
+              </section>
             </div>
           </div>
         </section>
@@ -198,7 +264,7 @@
                 <div class="board-element board-element--title is-selected" data-layer-id="title-base" data-type="title" style="left: 0%; top: 0%; width: 34%; height: 6.5%;">
                   <h2 id="boardTitle">Titre de la carte</h2>
                 </div>
-                <div class="board-element board-element--source" data-layer-id="source-base" data-type="source" style="left: 0.25%; top: 18%; width: 2.2%; height: 22%;">
+                <div class="board-element board-element--source is-hidden" data-layer-id="source-base" data-type="source" style="left: 0.25%; top: 18%; width: 2.2%; height: 22%;">
                   <p class="board-element__eyebrow">Source</p>
                   <p id="boardSource">Source : a completer</p>
                 </div>
@@ -231,8 +297,9 @@
               <div class="carto-toolbox__group">
                 <p class="carto-toolbox__group-title">Rubriques standards</p>
                 <div class="carto-toolbox__menu carto-toolbox__menu--side">
-                  <button class="carto-toolbox__menu-btn" type="button" data-side-target="layersPanel">Calques</button>
+                  <button class="carto-toolbox__menu-btn" type="button" data-side-target="layersPanel">Gestion des objets</button>
                   <button class="carto-toolbox__menu-btn is-active" type="button" data-side-target="propertiesPanel">Proprietes</button>
+                  <button class="carto-toolbox__menu-btn" type="button" data-side-target="legendManagerPanel">Gestion de la legende</button>
                 </div>
               </div>
 
@@ -292,6 +359,49 @@
                     <label class="fr-label" for="selectedRotation">Rotation</label>
                     <input class="fr-input" id="selectedRotation" type="range" min="-180" max="180" value="0">
                   </div>
+                </div>
+                <div class="carto-inline-actions carto-inline-actions--tight">
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="bringForward">Monter</button>
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="sendBackward">Descendre</button>
+                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="deleteLayer">Supprimer</button>
+                </div>
+              </section>
+
+              <section class="carto-side-panel" id="legendManagerPanel">
+                <h2 class="fr-h6">Gestion de la legende</h2>
+                <p class="fr-text--xs carto-muted">Gerer les sous-blocs, la mise en ligne et la taille des pictos de legende.</p>
+                <div class="carto-form-grid">
+                  <h3 class="fr-h6">Proprietes de l'element (legende)</h3>
+                  <p class="fr-text--xs carto-muted" id="legendSelectionHint">Selectionnez un titre de sous-bloc ou un libelle de picto dans la legende.</p>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSelectedText">Texte / etiquette (legende)</label>
+                    <input class="fr-input" id="legendSelectedText" type="text" placeholder="Texte du titre ou du libelle de legende">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSelectedFontSize">Taille du texte (legende)</label>
+                    <input class="fr-input" id="legendSelectedFontSize" type="number" min="4" max="72" step="1" value="13">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSelectedTextColor">Couleur du texte (legende)</label>
+                    <input class="fr-input carto-color-input" id="legendSelectedTextColor" type="color" value="#161616">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSelectedTextBackground">Fond du texte (legende)</label>
+                    <input class="fr-input carto-color-input" id="legendSelectedTextBackground" type="color" value="#ffffff">
+                  </div>
+                  <div class="fr-input-group">
+                    <label class="fr-label" for="legendSelectedFontFamily">Police (legende)</label>
+                    <select class="fr-select" id="legendSelectedFontFamily">
+                      <option value="Marianne, Arial, sans-serif">Marianne</option>
+                      <option value="Georgia, Times New Roman, serif">Serif</option>
+                      <option value="Courier New, monospace">Monospace</option>
+                    </select>
+                  </div>
+                  <div class="carto-inline-actions carto-inline-actions--tight">
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendToggleBold">Gras</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendToggleItalic">Italique</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendToggleTransparentBackground">Fond transparent</button>
+                  </div>
                   <div class="fr-input-group">
                     <label class="fr-label" for="legendColumns">Elements par ligne (legende)</label>
                     <input class="fr-input" id="legendColumns" type="range" min="1" max="6" value="1">
@@ -300,21 +410,15 @@
                     <label class="fr-label" for="legendSymbolSize">Taille des pictos (legende)</label>
                     <input class="fr-input" id="legendSymbolSize" type="range" min="10" max="44" value="20">
                   </div>
-                  <div class="carto-section-head">
-                    <div>
-                      <h3 class="fr-h6">Gestion de la legende</h3>
-                      <p class="fr-text--xs carto-muted">Ajouter un sous-bloc ou reinitialiser la structure.</p>
-                    </div>
+                  <div class="carto-inline-actions">
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendMoveUp">Monter sous-bloc</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendMoveDown">Descendre sous-bloc</button>
+                    <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendRenameSection">Renommer sous-bloc</button>
                   </div>
                   <div class="carto-inline-actions">
                     <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendAddSection">+ Sous-bloc</button>
                     <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="legendReset">Reinitialiser</button>
                   </div>
-                </div>
-                <div class="carto-inline-actions carto-inline-actions--tight">
-                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="bringForward">Monter</button>
-                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="sendBackward">Descendre</button>
-                  <button class="fr-btn fr-btn--secondary fr-btn--sm" type="button" id="deleteLayer">Supprimer</button>
                 </div>
               </section>
             </div>
